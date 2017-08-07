@@ -1,0 +1,27 @@
+-- 带事务 读写混合 		预期:Master
+begin;
+select * from test where id = 1;
+update test set oldcontent = content , content = Date() where id = 1;
+commit;
+
+
+-- 带事务 读		 	预期:Master
+begin;
+select * from test where id = 2;
+commit;
+
+
+-- 带事务 readonly  读	预期:Slave
+set global read_only=on;
+begin;
+select * from test where id = 3;
+commit;
+
+
+-- 不带事务 读			预期:Slave
+select * from test where id = 4;
+
+
+-- 不带事务 readonly 读	预期:Slave
+set global read_only=off;
+select * from test where id = 5;
